@@ -1,0 +1,6 @@
+{
+  "name": "Lumina Studio",
+  "description": "3D визуализация, архитектурные концепции и игровые ассеты с высочайшей детализацией",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
