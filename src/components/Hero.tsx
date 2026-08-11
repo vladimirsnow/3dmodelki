@@ -2,10 +2,9 @@ import React from 'react';
 
 interface HeroProps {
   onExploreProjects: () => void;
-  onExploreServices: () => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onExploreProjects, onExploreServices }) => {
+export const Hero: React.FC<HeroProps> = ({ onExploreProjects }) => {
   return (
     <section className="flex flex-col space-y-8 pt-12 md:pt-20 pb-12 items-start max-w-[1440px] mx-auto px-5 md:px-16 relative overflow-hidden">
       {/* Background ambient lighting */}
@@ -14,18 +13,18 @@ export const Hero: React.FC<HeroProps> = ({ onExploreProjects, onExploreServices
 
       <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-semibold uppercase tracking-widest text-[#adc6ff] animate-pulse">
         <span className="w-2 h-2 rounded-full bg-[#4b8eff]"></span>
-        Lumina 3D Real-Time Studio 2026
+        Art avenue 3D Real-Time Studio 2026
       </div>
 
       <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[64px] text-[#e2e2e2] font-bold leading-[1.15] tracking-tight font-['Inter'] max-w-5xl">
-        Воплощаем идеи в 3D: <br />
+        Качественная архитектура <br />
         <span className="text-[#adc6ff]/90 bg-gradient-to-r from-[#adc6ff] to-[#4b8eff] bg-clip-text text-transparent">
-          от интерьеров до игровых миров
+          и продвинутые 3D-модели
         </span>
       </h1>
 
       <p className="text-base md:text-lg text-[#c4c7c7] max-w-2xl leading-relaxed">
-        Мы создаем гиперреалистичные визуализации, архитектурные концепции и игровые ассеты с исключительным вниманием к деталям.
+        Создаём качественную архитектуру и планы интерьеров зданий, а также реализуем игровые задумки и создаем модели продвинутого характера.
       </p>
 
       {/* Hero CTA buttons */}
@@ -40,17 +39,6 @@ export const Hero: React.FC<HeroProps> = ({ onExploreProjects, onExploreServices
         >
           <span>СМОТРЕТЬ РАБОТЫ</span>
           <span className="material-symbols-outlined text-lg">arrow_downward</span>
-        </a>
-
-        <a
-          href="#expertise"
-          onClick={(e) => {
-            e.preventDefault();
-            onExploreServices();
-          }}
-          className="w-full sm:w-auto bg-[#282a2b] text-[#e2e2e2] px-8 py-4 rounded-xl font-semibold text-xs tracking-wider uppercase text-center flex items-center justify-center hover:bg-[#333535] transition-colors shadow-md border border-white/10 cursor-pointer"
-        >
-          НАШИ УСЛУГИ
         </a>
       </div>
 

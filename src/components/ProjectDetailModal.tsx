@@ -14,7 +14,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
 }) => {
   if (!project) return null;
 
-  const [activeTab, setActiveTab] = useState<'render' | 'secondary' | 'spec'>('render');
+  const [activeTab, setActiveTab] = useState<'render' | 'secondary' | 'model'>('render');
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
@@ -39,16 +39,26 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
         {/* Modal content body */}
         <div className="p-6 space-y-6">
           {/* Main Media Showcase */}
-          <div className="relative rounded-xl overflow-hidden bg-black aspect-video border border-white/10 group">
-            <img
-              src={
-                activeTab === 'secondary' && project.secondaryImageUrl
-                  ? project.secondaryImageUrl
-                  : project.imageUrl
-              }
-              alt={project.title}
-              className="w-full h-full object-cover transition-transform duration-500"
-            />
+          <div className="relative rounded-xl overflow-hidden bg-black aspect-video border border-white/10 group flex items-center justify-center">
+            {activeTab === 'model' && project.modelUrl ? (
+              <div 
+                // @ts-ignore
+                dangerouslySetInnerHTML={{
+                  __html: `<model-viewer src="${project.modelUrl}" camera-controls auto-rotate style="width: 100%; height: 100%; outline: none;"></model-viewer>`
+                }}
+                className="w-full h-full"
+              />
+            ) : (
+              <img
+                src={
+                  activeTab === 'secondary' && project.secondaryImageUrl
+                    ? project.secondaryImageUrl
+                    : project.imageUrl
+                }
+                alt={project.title}
+                className="w-full h-full object-cover transition-transform duration-500"
+              />
+            )}
 
             {/* Media View Selector Overlay */}
             <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between bg-[#121414]/80 backdrop-blur-md p-2 rounded-lg border border-white/10">
@@ -73,6 +83,18 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                     }`}
                   >
                     Доп. Ракурс
+                  </button>
+                )}
+                {project.modelUrl && (
+                  <button
+                    onClick={() => setActiveTab('model')}
+                    className={`px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider transition-all ${
+                      activeTab === 'model'
+                        ? 'bg-[#4b8eff] text-[#00285c]'
+                        : 'bg-white/5 text-white hover:bg-white/10'
+                    }`}
+                  >
+                    3D Модель
                   </button>
                 )}
               </div>

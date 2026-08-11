@@ -9,6 +9,7 @@ export interface Project {
   imageUrl: string;
   secondaryImageUrl?: string;
   wireframeUrl?: string;
+  modelUrl?: string;
   specs: {
     software: string[];
     polygons: string;

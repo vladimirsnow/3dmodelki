@@ -33,11 +33,11 @@ export const AboutSection: React.FC = () => {
             О студии
           </span>
           <h2 className="text-2xl md:text-3xl font-bold text-[#e2e2e2] font-['Inter'] max-w-xl">
-            Мы соединяем архитектурное искусство с технологиями игровых движков
+            Создаём качественную архитектуру, планы интерьеров и модели продвинутого характера
           </h2>
         </div>
         <p className="text-sm text-[#c4c7c7] max-w-md leading-relaxed">
-          Lumina Studio — международная команда 3D-художников, архитекторов и специалиста по Unreal Engine 5.
+          Art avenue реализует все игровые задумки и проектирует качественные интерьеры для любых задач.
         </p>
       </div>
 

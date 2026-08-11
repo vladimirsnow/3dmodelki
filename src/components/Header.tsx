@@ -17,7 +17,6 @@ export const Header: React.FC<HeaderProps> = ({ onOpenContactModal }) => {
 
   const navLinks = [
     { id: 'portfolio', label: 'Работы', href: '#portfolio' },
-    { id: 'expertise', label: 'Услуги', href: '#expertise' },
     { id: 'tech-stack', label: 'Стек', href: '#tech-stack' },
     { id: 'about', label: 'О нас', href: '#about' },
     { id: 'contacts', label: 'Контакты', href: '#footer-contact' },
@@ -28,7 +27,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenContactModal }) => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
 
-      const sectionIds = ['portfolio', 'expertise', 'tech-stack', 'about', 'footer-contact'];
+      const sectionIds = ['portfolio', 'tech-stack', 'about', 'footer-contact'];
       const scrollPosition = window.scrollY + 200;
 
       for (let i = sectionIds.length - 1; i >= 0; i--) {
@@ -71,11 +70,11 @@ export const Header: React.FC<HeaderProps> = ({ onOpenContactModal }) => {
         <a href="#" className="flex items-center gap-3 group">
           <img 
             src={STUDIO_LOGO} 
-            alt="Lumina Studio Logo" 
+            alt="Art avenue Logo" 
             className="h-8 w-auto object-contain rounded-sm transition-transform duration-300 group-hover:scale-105"
           />
           <span className="font-semibold text-xl tracking-tight text-[#e2e2e2] hidden sm:block font-['Inter']">
-            Lumina Studio
+            Art avenue
           </span>
         </a>
 

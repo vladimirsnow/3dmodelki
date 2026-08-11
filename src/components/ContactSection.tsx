@@ -57,18 +57,18 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
             </h2>
 
             <p className="text-[#c4c7c7] text-base md:text-lg max-w-md leading-relaxed">
-              Превращаем архитектурные концепции в гиперреалистичный визуальный опыт. Обсудите ваш следующий проект с нашей командой.
+              Обсудите с нашей командой создание архитектуры, планов интерьеров или моделей продвинутого характера.
             </p>
 
             <div className="space-y-6 pt-4">
               <a
-                href="mailto:hello@lumina-studio.art"
+                href="mailto:hello@artavenue.com"
                 className="flex items-center gap-4 text-[#c4c7c7] hover:text-[#adc6ff] transition-colors group"
               >
                 <div className="w-12 h-12 rounded-full bg-[#1e2020] flex items-center justify-center group-hover:bg-[#4b8eff]/20 transition-colors border border-white/5">
                   <span className="material-symbols-outlined text-xl text-[#adc6ff]">mail</span>
                 </div>
-                <span className="text-base font-medium">hello@lumina-studio.art</span>
+                <span className="text-base font-medium">hello@artavenue.com</span>
               </a>
 
               <div className="flex items-center gap-4 text-[#c4c7c7] hover:text-[#adc6ff] transition-colors group">
@@ -176,7 +176,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
         {/* Footer Sub-bar */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-6 border-t border-white/10 pt-8">
           <div className="text-xs text-[#c4c7c7] tracking-widest uppercase">
-            © 2026 LUMINA STUDIO. ВСЕ ПРАВА ЗАЩИЩЕНЫ.
+            © 2026 ART AVENUE. ВСЕ ПРАВА ЗАЩИЩЕНЫ.
           </div>
 
           <div className="flex gap-8">

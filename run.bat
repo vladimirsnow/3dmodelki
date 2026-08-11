@@ -1,0 +1,6 @@
+@echo off
+echo Установка зависимостей...
+call npm install
+echo Запуск проекта...
+call npm run dev
+pause

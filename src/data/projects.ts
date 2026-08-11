@@ -1,6 +1,6 @@
 import { Project, Service, TechItem } from '../types';
 
-export const STUDIO_LOGO = "https://lh3.googleusercontent.com/aida/AP1WRLvrrm5Kl-YMCraOGKZ03AYw3CKFH7pKW1Gla1s7-CBKyfoPL1lH3A_Klb3BtnPrxIOGyjBc8oVB_cgi_8ZjdCiLH0udjzF1hb1Ftq8PMDqdy65UzxgW_qRNqlXJu9N-GKnUym0yq8HlnvnUyjz3qIHBvluV75u4hnNJQv9hU_5WSV3Q0Ttr6kSTgaf5-jU5r7l_UGQ610ozPAewn3TTF3BuNRf9HxcXpQlBFvPqyaVo2z0Shgm-FEjzu-j2";
+export const STUDIO_LOGO = "https://placehold.co/200x50?text=Logo+200x50";
 
 export const USER_AVATAR = "https://lh3.googleusercontent.com/aida/AP1WRLs6l6K91uOn4UZ-3o0f9dJIPmOn6XaMnPF7JH4PEgE5T-aRfkODDySsdDqY0T65zTRBOngQG-LMLOk8oqIzuGecxXMJcU8v8ECnRq5xAVCPAEgEUIvUX11KqNfAG0h1ZFWZcAlf9n_vbjYvNCCnYOeVAqyVljJvJJWaUyQ4rNeX0CK7M22BBQWva9b1-_NrtmHgn_I-sDW1W3c-epRWEevR76JQI3ypkGa8-0z3el5hapNzO1VrzXUeulrh";
 
@@ -15,7 +15,7 @@ export const PROJECTS: Project[] = [
     fullDescription: "Проект высококлассной жилой недвижимости премиум-сегмента. Главная цель — воссоздать баланс естественного дневного света, панорамных видов на мегаполис и физически точной микротекстуры камня, натурального дерева и велюра. Сцена оптимизирована под реальное время в Unreal Engine 5 с применением технологий Lumen и Nanite.",
     category: 'Интерьеры',
     tags: ['Интерьеры', 'Unreal Engine 5'],
-    imageUrl: "https://lh3.googleusercontent.com/aida/AP1WRLv5p6CJ3a2aEIdwCrqMvXgiw5PAppCmCXxatAkYzeAhSDzdXCihEh673cTltZBB5Y-dkIh4TPuIfONDDY7D-woJ2QA19GNekgFegysWJpwYI5Ysb9M5UiyT5NHzZtpHKriKUXUYOoWqVzCS1wVOn0eXYHGeJADzo5LsULKWUoxt18AWOfK_r06mOT7rqfR_Nf4qt1orC9XwxvEC7zwyzzrlTOKRVKZZxxbe6r6MynobWMbFRb1bIjqXBgyY",
+    imageUrl: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1600&q=80",
     secondaryImageUrl: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=80",
     specs: {
       software: ['3ds Max', 'Corona Render', 'Unreal Engine 5', 'Substance Designer'],
@@ -35,8 +35,8 @@ export const PROJECTS: Project[] = [
     fullDescription: "Пакет игровых ассетов KINETIC-7 'STORM' для AAA киберпанк экшена. Включает полную PBR текстуризацию с 4K разрешениями, детективную сетку повреждений, кастомную анимацию перезарядки и процедурный износ поверхностей. Оптимизирован под жёсткие полигональные бюджеты современности.",
     category: 'Game Dev',
     tags: ['Game Dev', 'Hard Surface'],
-    imageUrl: "https://lh3.googleusercontent.com/aida/AP1WRLu7B4fHl9UtYYDcPFlKDrE6VlMPS1u1u4mdNcHshyswt6QDfR7sb2CTsxrP__B5HZinVMg-uZrjQq_R20_hdhsPxThvHHVuwil1WqyWmEPj5Ri8kgy8LxkQmsXhY2z1Ec46aUgHCHNwBLhnJJjplEzrrMR_rgtK0OdJoeoKH7Ghgs4AW5dmwU0C5PhXvP9zyK9RcAlNE3lTjM9JzdLjfinb5isSupf9xsDWlXi8bp1sFgiMaRd6yi6GMVxx",
-    secondaryImageUrl: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=1600&q=80",
+    imageUrl: "https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&w=1600&q=80",
+    secondaryImageUrl: "https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&w=1600&q=80",
     specs: {
       software: ['Blender', 'Marmoset Toolbag', 'Substance Painter', 'ZBrush'],
       polygons: '48.5K Triangles (Low-Poly)',
@@ -76,6 +76,7 @@ export const PROJECTS: Project[] = [
     category: 'Hard Surface',
     tags: ['Hard Surface', 'Game Dev'],
     imageUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1600&q=80",
+    modelUrl: "https://modelviewer.dev/shared-assets/models/Astronaut.glb",
     specs: {
       software: ['Fusion 360', 'ZBrush', 'KeyShot', 'Substance Painter'],
       polygons: '850K Triangles',
