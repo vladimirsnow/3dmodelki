@@ -27,11 +27,11 @@ database.sqlite
 public/uploads/*
 !public/uploads/.gitkeep
 
-# Markdown files (убираем все промты и гайды с паролями)
+# Markdown files
 *.md
-!README.md
 
-# IDE
+# Prompts
+промт/
 .vscode/
 .idea/
 
