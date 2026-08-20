@@ -27,8 +27,9 @@ database.sqlite
 public/uploads/*
 !public/uploads/.gitkeep
 
-# Admin documentation with credentials
-admin_password_guide.md
+# Markdown files (убираем все промты и гайды с паролями)
+*.md
+!README.md
 
 # IDE
 .vscode/
