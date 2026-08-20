@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { InquiryForm } from '../types';
+import { useData } from '../context/DataContext';
+import { EditableText } from './EditableText';
 
 interface ContactSectionProps {
   initialService?: string;
@@ -12,6 +14,13 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
   initialBudget,
   initialDetails,
 }) => {
+  const { settings, updateSetting } = useData();
+  const contactEmail = settings.contactEmail || 'hello@artavenue.com';
+  const contactAddress = settings.contactAddress || 'Москва, Кутузовский пр-т, 12';
+  const linkBehance = settings.linkBehance || 'https://behance.net';
+  const linkInstagram = settings.linkInstagram || 'https://instagram.com';
+  const linkVimeo = settings.linkVimeo || 'https://vimeo.com';
+
   const [formData, setFormData] = useState<InquiryForm>({
     name: '',
     email: '',
@@ -38,8 +47,6 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
-    // Simulate server submission
     setTimeout(() => {
       setLoading(false);
       setSubmitted(true);
@@ -52,30 +59,38 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24 mb-16">
           {/* Contact Left Column */}
           <div className="space-y-8">
-            <h2 className="text-4xl md:text-5xl lg:text-6xl text-[#e2e2e2] leading-tight font-bold font-['Inter']">
-              Давайте<br />создавать.
-            </h2>
+            <EditableText
+              tag="h2"
+              multiline
+              className="text-4xl md:text-5xl lg:text-6xl text-[#e2e2e2] leading-tight font-bold font-['Inter']"
+              value={settings.contactTitle || 'Давайте\nсоздавать.'}
+              onSave={async (val) => await updateSetting('contactTitle', val)}
+            />
 
-            <p className="text-[#c4c7c7] text-base md:text-lg max-w-md leading-relaxed">
-              Обсудите с нашей командой создание архитектуры, планов интерьеров или моделей продвинутого характера.
-            </p>
+            <EditableText
+              tag="p"
+              multiline
+              className="text-[#c4c7c7] text-base md:text-lg max-w-md leading-relaxed"
+              value={settings.contactSubtitle || 'Обсудите с нашей командой создание архитектуры, планов интерьеров или моделей продвинутого характера.'}
+              onSave={async (val) => await updateSetting('contactSubtitle', val)}
+            />
 
             <div className="space-y-6 pt-4">
               <a
-                href="mailto:hello@artavenue.com"
-                className="flex items-center gap-4 text-[#c4c7c7] hover:text-[#adc6ff] transition-colors group"
+                href={`mailto:${contactEmail}`}
+                className="flex items-center gap-4 text-[#c4c7c7] hover:text-[#adc6ff] transition-colors group w-fit"
               >
                 <div className="w-12 h-12 rounded-full bg-[#1e2020] flex items-center justify-center group-hover:bg-[#4b8eff]/20 transition-colors border border-white/5">
                   <span className="material-symbols-outlined text-xl text-[#adc6ff]">mail</span>
                 </div>
-                <span className="text-base font-medium">hello@artavenue.com</span>
+                <span className="text-base font-medium">{contactEmail}</span>
               </a>
 
-              <div className="flex items-center gap-4 text-[#c4c7c7] hover:text-[#adc6ff] transition-colors group">
+              <div className="flex items-center gap-4 text-[#c4c7c7] hover:text-[#adc6ff] transition-colors group w-fit">
                 <div className="w-12 h-12 rounded-full bg-[#1e2020] flex items-center justify-center group-hover:bg-[#4b8eff]/20 transition-colors border border-white/5">
                   <span className="material-symbols-outlined text-xl text-[#adc6ff]">location_on</span>
                 </div>
-                <span className="text-base font-medium">Москва, Кутузовский пр-т, 12</span>
+                <span className="text-base font-medium">{contactAddress}</span>
               </div>
             </div>
           </div>
@@ -181,7 +196,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
 
           <div className="flex gap-8">
             <a
-              href="https://behance.net"
+              href={linkBehance}
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-[#c4c7c7] hover:text-[#adc6ff] transition-colors tracking-widest uppercase"
@@ -189,7 +204,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
               BEHANCE
             </a>
             <a
-              href="https://instagram.com"
+              href={linkInstagram}
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-[#c4c7c7] hover:text-[#adc6ff] transition-colors tracking-widest uppercase"
@@ -197,7 +212,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
               INSTAGRAM
             </a>
             <a
-              href="https://vimeo.com"
+              href={linkVimeo}
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-[#c4c7c7] hover:text-[#adc6ff] transition-colors tracking-widest uppercase"

@@ -1,6 +1,6 @@
 import { Project, Service, TechItem } from '../types';
 
-export const STUDIO_LOGO = "https://placehold.co/200x50?text=Logo+200x50";
+export const STUDIO_LOGO = "/img/logo.png";
 
 export const USER_AVATAR = "https://lh3.googleusercontent.com/aida/AP1WRLs6l6K91uOn4UZ-3o0f9dJIPmOn6XaMnPF7JH4PEgE5T-aRfkODDySsdDqY0T65zTRBOngQG-LMLOk8oqIzuGecxXMJcU8v8ECnRq5xAVCPAEgEUIvUX11KqNfAG0h1ZFWZcAlf9n_vbjYvNCCnYOeVAqyVljJvJJWaUyQ4rNeX0CK7M22BBQWva9b1-_NrtmHgn_I-sDW1W3c-epRWEevR76JQI3ypkGa8-0z3el5hapNzO1VrzXUeulrh";
 

@@ -1,9 +1,38 @@
+# Dependencies
 node_modules/
+
+# Build output
 build/
 dist/
-coverage/
+
+# System files
 .DS_Store
+Thumbs.db
+
+# Logs
 *.log
-.env*
+npm-debug.log*
+
+# Environment variables (НИКОГДА не пушить в git!)
+.env
+.env.local
+.env.production
 !.env.example
-README.md
+
+# Database (содержит хэши паролей)
+database.sqlite
+*.sqlite
+
+# Uploaded files (хранятся локально)
+public/uploads/*
+!public/uploads/.gitkeep
+
+# Admin documentation with credentials
+admin_password_guide.md
+
+# IDE
+.vscode/
+.idea/
+
+# Coverage
+coverage/

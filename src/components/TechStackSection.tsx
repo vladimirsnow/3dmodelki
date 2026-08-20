@@ -1,13 +1,40 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { TECH_STACK, VIEWPORT_BG } from '../data/projects';
+import { VIEWPORT_BG } from '../data/projects';
+import { EditableText } from './EditableText';
+import { useData } from '../context/DataContext';
+import { useAdmin } from '../context/AdminContext';
 
 export const TechStackSection: React.FC = () => {
   const [renderMode, setRenderMode] = useState<'rt' | 'wireframe' | 'solid' | 'pbr'>('rt');
   const [isRotating, setIsRotating] = useState<boolean>(true);
   const [rotationAngle, setRotationAngle] = useState<number>(0);
+  // Local draft percentages for live bar preview while typing
+  const [draftPct, setDraftPct] = useState<Record<number, string>>({});
   const [polyCount, setPolyCount] = useState<string>('1.2M');
 
   const animRef = useRef<number | null>(null);
+  const { settings, updateSetting } = useData();
+  const { isAdminMode } = useAdmin();
+
+  const defaultTechStack = JSON.stringify([
+    { name: 'Blender / Cinema 4D', percentage: 95, description: 'Основной инструмент для создания 3D моделей, сцен и анимации.' },
+    { name: 'Unreal Engine 5', percentage: 88, description: 'Среда интерактивной визуализации в реальном времени (Lumen, Nanite).' },
+    { name: 'Substance Painter', percentage: 92, description: 'Физически корректное PBR текстурирование с уровнем 4K.' },
+    { name: 'ZBrush / Houdini', percentage: 85, description: 'Органический скульптинг и процедурные эффекты.' },
+  ]);
+
+  let techStack: { name: string; percentage: number; description: string }[];
+  try {
+    techStack = JSON.parse(settings.techStackData || defaultTechStack);
+  } catch {
+    techStack = JSON.parse(defaultTechStack);
+  }
+
+  const updateTechItem = async (idx: number, field: 'name' | 'description' | 'percentage', value: string) => {
+    const updated = [...techStack];
+    updated[idx] = { ...updated[idx], [field]: field === 'percentage' ? Math.min(100, Math.max(0, parseInt(value) || 0)) : value };
+    return await updateSetting('techStackData', JSON.stringify(updated));
+  };
 
   useEffect(() => {
     if (isRotating) {
@@ -37,30 +64,82 @@ export const TechStackSection: React.FC = () => {
             <span className="text-xs uppercase tracking-widest text-[#adc6ff] font-semibold block mb-2">
               Софт и Инструменты
             </span>
-            <h2 className="text-2xl md:text-3xl font-bold text-[#e2e2e2] font-['Inter']">
-              Технологический стек
-            </h2>
-            <p className="text-sm text-[#c4c7c7] mt-3 leading-relaxed">
-              Мы используем передовое программное обеспечение для достижения бескомпромиссного качества в каждом рендере и модели.
-            </p>
+            <EditableText
+              tag="h2"
+              className="text-2xl md:text-3xl font-bold text-[#e2e2e2] font-['Inter']"
+              value={settings.techStackTitle || 'Технологический стек'}
+              onSave={async (val) => await updateSetting('techStackTitle', val)}
+            />
+            <EditableText
+              tag="p"
+              multiline
+              className="text-sm text-[#c4c7c7] mt-3 leading-relaxed"
+              value={settings.techStackDesc || 'Мы используем передовое программное обеспечение для достижения бескомпромиссного качества в каждом рендере и модели.'}
+              onSave={async (val) => await updateSetting('techStackDesc', val)}
+            />
           </div>
 
           <div className="space-y-6">
-            {TECH_STACK.map((item, idx) => (
-              <div key={idx} className="space-y-2">
-                <div className="flex justify-between text-xs font-semibold">
-                  <span className="text-[#e2e2e2]">{item.name}</span>
-                  <span className="text-[#adc6ff] font-mono">{item.percentage}%</span>
+            {techStack.map((item, idx) => {
+              // live display value: draft if user is editing, else saved
+              const displayPct = draftPct[idx] !== undefined ? Number(draftPct[idx]) : item.percentage;
+              const clampedPct = Math.min(100, Math.max(0, displayPct || 0));
+              return (
+              <div key={idx} className={`space-y-2 rounded-xl p-3 -mx-3 transition-colors ${isAdminMode ? 'hover:bg-white/5 ring-1 ring-[#4b8eff]/10' : ''}`}>
+                <div className="flex justify-between text-xs font-semibold items-center">
+                  <EditableText
+                    tag="span"
+                    className="text-[#e2e2e2]"
+                    value={item.name}
+                    onSave={async (val) => await updateTechItem(idx, 'name', val)}
+                  />
+                  {isAdminMode ? (
+                    <div className="flex items-center gap-1">
+                      <input
+                        type="number"
+                        min={0}
+                        max={100}
+                        value={draftPct[idx] !== undefined ? draftPct[idx] : item.percentage}
+                        onChange={(e) => {
+                          setDraftPct(prev => ({ ...prev, [idx]: e.target.value }));
+                        }}
+                        onBlur={async (e) => {
+                          const val = String(Math.min(100, Math.max(0, parseInt(e.target.value) || 0)));
+                          await updateTechItem(idx, 'percentage', val);
+                          setDraftPct(prev => { const n = { ...prev }; delete n[idx]; return n; });
+                        }}
+                        onKeyDown={async (e) => {
+                          if (e.key === 'Enter') {
+                            const val = String(Math.min(100, Math.max(0, parseInt((e.target as HTMLInputElement).value) || 0)));
+                            await updateTechItem(idx, 'percentage', val);
+                            setDraftPct(prev => { const n = { ...prev }; delete n[idx]; return n; });
+                            (e.target as HTMLInputElement).blur();
+                          }
+                        }}
+                        className="w-14 bg-black/50 border border-[#4b8eff]/50 rounded px-2 py-0.5 text-[#adc6ff] font-mono text-xs text-right focus:border-[#4b8eff] outline-none"
+                      />
+                      <span className="text-[#adc6ff] font-mono text-xs">%</span>
+                    </div>
+                  ) : (
+                    <span className="text-[#adc6ff] font-mono">{item.percentage}%</span>
+                  )}
                 </div>
                 <div className="h-1.5 bg-[#1e2020] rounded-full overflow-hidden border border-white/5">
                   <div
-                    className="h-full bg-gradient-to-r from-[#4b8eff] to-[#adc6ff] rounded-full transition-all duration-1000"
-                    style={{ width: `${item.percentage}%` }}
+                    className="h-full bg-gradient-to-r from-[#4b8eff] to-[#adc6ff] rounded-full transition-all duration-300"
+                    style={{ width: `${clampedPct}%` }}
                   ></div>
                 </div>
-                <p className="text-[11px] text-[#8e9192]">{item.description}</p>
+                <EditableText
+                  tag="p"
+                  multiline
+                  className="text-[11px] text-[#8e9192]"
+                  value={item.description}
+                  onSave={async (val) => await updateTechItem(idx, 'description', val)}
+                />
               </div>
-            ))}
+            );
+            })}
           </div>
         </div>
 

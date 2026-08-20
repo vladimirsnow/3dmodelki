@@ -1,7 +1,14 @@
 import React from 'react';
+import { EditableText } from './EditableText';
+import { useData } from '../context/DataContext';
+import { useAdmin } from '../context/AdminContext';
 
 export const AboutSection: React.FC = () => {
-  const pipelineSteps = [
+  const { settings, updateSetting } = useData();
+  const { isAdminMode } = useAdmin();
+
+  // Default pipeline steps stored as JSON in settings
+  const defaultSteps = JSON.stringify([
     {
       num: '01',
       title: 'Концепция & ТЗ',
@@ -22,7 +29,20 @@ export const AboutSection: React.FC = () => {
       title: 'Real-Time Освещение & UE5',
       description: 'Настраиваем динамический свет Lumen, атмосферный туман и физику материалов в Unreal Engine 5.'
     }
-  ];
+  ]);
+
+  let pipelineSteps: { num: string; title: string; description: string }[];
+  try {
+    pipelineSteps = JSON.parse(settings.pipelineSteps || defaultSteps);
+  } catch {
+    pipelineSteps = JSON.parse(defaultSteps);
+  }
+
+  const updateStep = async (idx: number, field: 'num' | 'title' | 'description', value: string) => {
+    const updated = [...pipelineSteps];
+    updated[idx] = { ...updated[idx], [field]: value };
+    return await updateSetting('pipelineSteps', JSON.stringify(updated));
+  };
 
   return (
     <section id="about" className="flex flex-col space-y-12 max-w-[1440px] mx-auto px-5 md:px-16 pt-16">
@@ -32,13 +52,21 @@ export const AboutSection: React.FC = () => {
           <span className="text-xs uppercase tracking-widest text-[#adc6ff] font-semibold block mb-2">
             О студии
           </span>
-          <h2 className="text-2xl md:text-3xl font-bold text-[#e2e2e2] font-['Inter'] max-w-xl">
-            Создаём качественную архитектуру, планы интерьеров и модели продвинутого характера
-          </h2>
+          <EditableText
+            tag="h2"
+            className="text-2xl md:text-3xl font-bold text-[#e2e2e2] font-['Inter'] max-w-xl"
+            value={settings.aboutTitle || 'Создаём качественную архитектуру, планы интерьеров и модели продвинутого характера'}
+            onSave={async (val) => await updateSetting('aboutTitle', val)}
+          />
         </div>
-        <p className="text-sm text-[#c4c7c7] max-w-md leading-relaxed">
-          Art avenue реализует все игровые задумки и проектирует качественные интерьеры для любых задач.
-        </p>
+        
+        <EditableText
+          tag="p"
+          multiline
+          className="text-sm text-[#c4c7c7] max-w-md leading-relaxed"
+          value={settings.aboutDescription || 'Art avenue реализует все игровые задумки и проектирует качественные интерьеры для любых задач.'}
+          onSave={async (val) => await updateSetting('aboutDescription', val)}
+        />
       </div>
 
       {/* Production Pipeline */}
@@ -48,16 +76,39 @@ export const AboutSection: React.FC = () => {
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {pipelineSteps.map((step) => (
+          {pipelineSteps.map((step, idx) => (
             <div
-              key={step.num}
-              className="bg-[#1a1c1c] p-6 rounded-2xl border border-white/5 space-y-4 hover:border-white/20 transition-all group"
+              key={idx}
+              className={`bg-[#1a1c1c] p-6 rounded-2xl border space-y-4 hover:border-white/20 transition-all group ${
+                isAdminMode ? 'border-white/10 ring-1 ring-[#4b8eff]/20' : 'border-white/5'
+              }`}
             >
+              {isAdminMode && (
+                <span className="text-[9px] text-[#4b8eff] uppercase tracking-widest font-bold block -mb-2">
+                  ✏ карточка {idx + 1}
+                </span>
+              )}
               <div className="text-2xl font-bold text-[#adc6ff] font-mono group-hover:text-white transition-colors">
-                {step.num}
+                <EditableText
+                  tag="span"
+                  className="text-2xl font-bold text-[#adc6ff] font-mono"
+                  value={step.num}
+                  onSave={async (val) => await updateStep(idx, 'num', val)}
+                />
               </div>
-              <h4 className="text-base font-semibold text-white">{step.title}</h4>
-              <p className="text-xs text-[#c4c7c7] leading-relaxed">{step.description}</p>
+              <EditableText
+                tag="h4"
+                className="text-base font-semibold text-white"
+                value={step.title}
+                onSave={async (val) => await updateStep(idx, 'title', val)}
+              />
+              <EditableText
+                tag="p"
+                multiline
+                className="text-xs text-[#c4c7c7] leading-relaxed"
+                value={step.description}
+                onSave={async (val) => await updateStep(idx, 'description', val)}
+              />
             </div>
           ))}
         </div>

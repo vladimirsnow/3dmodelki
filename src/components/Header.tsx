@@ -71,7 +71,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenContactModal }) => {
           <img 
             src={STUDIO_LOGO} 
             alt="Art avenue Logo" 
-            className="h-8 w-auto object-contain rounded-sm transition-transform duration-300 group-hover:scale-105"
+            className="h-10 md:h-12 w-auto object-contain rounded-sm transition-transform duration-300 group-hover:scale-105"
           />
           <span className="font-semibold text-xl tracking-tight text-[#e2e2e2] hidden sm:block font-['Inter']">
             Art avenue

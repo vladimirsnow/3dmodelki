@@ -3,16 +3,76 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Art avenue</title>
+
+    <!-- SEO: Primary Meta Tags -->
+    <title>Art Avenue Studio — Студия премиального 3D дизайна | Архитектурная визуализация, Game Dev, Интерьеры</title>
+    <meta name="description" content="Art Avenue Studio — студия премиального 3D дизайна. Создаём гиперреалистичные визуализации интерьеров, архитектурные рендеры, 3D модели для Game Dev и Unreal Engine 5. Москва." />
+    <meta name="keywords" content="3D дизайн, архитектурная визуализация, 3D моделирование, Unreal Engine 5, интерьеры, Game Dev, рендеринг, PBR текстуры, Art Avenue Studio, 3D студия Москва" />
+    <meta name="author" content="Art Avenue Studio" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://artavenue-studio.vercel.app/" />
+
+    <!-- Open Graph / Facebook / VK / Telegram -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://artavenue-studio.vercel.app/" />
+    <meta property="og:title" content="Art Avenue Studio — Студия премиального 3D дизайна" />
+    <meta property="og:description" content="Создаём гиперреалистичные визуализации интерьеров, архитектурные рендеры и 3D модели для Game Dev. Unreal Engine 5, PBR, 4K." />
+    <meta property="og:image" content="https://artavenue-studio.vercel.app/img/og-preview.png" />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:site_name" content="Art Avenue Studio" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Art Avenue Studio — Студия премиального 3D дизайна" />
+    <meta name="twitter:description" content="Создаём гиперреалистичные визуализации интерьеров, архитектурные рендеры и 3D модели для Game Dev." />
+    <meta name="twitter:image" content="https://artavenue-studio.vercel.app/img/og-preview.png" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/img/logo.png" />
+    <link rel="apple-touch-icon" href="/img/logo.png" />
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#121414" />
+    <meta name="msapplication-TileColor" content="#121414" />
+
+    <!-- Preconnect for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+
+    <!-- Structured Data (JSON-LD) for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ProfessionalService",
+      "name": "Art Avenue Studio",
+      "description": "Студия премиального 3D дизайна. Архитектурная визуализация, 3D моделирование, Game Dev, интерьеры.",
+      "url": "https://artavenue-studio.vercel.app",
+      "logo": "https://artavenue-studio.vercel.app/img/logo.png",
+      "image": "https://artavenue-studio.vercel.app/img/og-preview.png",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Москва",
+        "addressCountry": "RU"
+      },
+      "priceRange": "$$",
+      "serviceType": ["3D Визуализация", "Архитектурная визуализация", "3D Моделирование", "Game Dev", "Дизайн интерьеров"],
+      "knowsAbout": ["Unreal Engine 5", "Blender", "Substance Painter", "PBR текстурирование", "ZBrush"],
+      "sameAs": []
+    }
+    </script>
   </head>
   <body class="bg-[#121414] text-[#e2e2e2] font-['Inter',sans-serif] selection:bg-[#4b8eff]/30 selection:text-white antialiased">
+    <!-- Noscript fallback for SEO crawlers -->
+    <noscript>
+      <h1>Art Avenue Studio — Студия премиального 3D дизайна</h1>
+      <p>Создаём гиперреалистичные визуализации интерьеров, архитектурные рендеры и 3D модели для Game Dev. Unreal Engine 5, PBR, 4K качество.</p>
+      <p>Услуги: 3D Дизайн интерьеров, Архитектурная визуализация, Game Dev ассеты, Hard Surface моделирование.</p>
+      <p>Контакты: hello@artavenue.com | Москва</p>
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-
