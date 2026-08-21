@@ -13,13 +13,6 @@
     <meta name="googlebot" content="index, follow" />
     <link rel="canonical" href="https://artavenue-studio.vercel.app/" />
 
-    <!-- Geo Targeting (Russian market) -->
-    <meta name="geo.region" content="RU-MOW" />
-    <meta name="geo.placename" content="Москва" />
-    <meta name="geo.position" content="55.7558;37.6173" />
-    <meta name="ICBM" content="55.7558, 37.6173" />
-    <meta name="language" content="Russian" />
-
     <!-- Open Graph / Facebook / VK / Telegram -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://artavenue-studio.vercel.app/" />
@@ -86,19 +79,13 @@
             "url": "https://artavenue-studio.vercel.app/img/logo.png"
           },
           "image": "https://artavenue-studio.vercel.app/img/og-preview.png",
-          "address": {
-            "@type": "PostalAddress",
-            "addressLocality": "Москва",
-            "addressRegion": "Москва",
-            "addressCountry": "RU"
-          },
           "priceRange": "$$",
-          "currenciesAccepted": "RUB",
-          "paymentAccepted": "Банковский перевод, Криптовалюта",
-          "areaServed": {
-            "@type": "Country",
-            "name": "Россия"
-          },
+          "areaServed": [
+            { "@type": "Country", "name": "Россия" },
+            { "@type": "Country", "name": "Казахстан" },
+            { "@type": "Country", "name": "Беларусь" },
+            { "@type": "Country", "name": "Украина" }
+          ],
           "hasOfferCatalog": {
             "@type": "OfferCatalog",
             "name": "Услуги 3D моделирования и визуализации",
@@ -170,7 +157,7 @@
     <!-- Noscript fallback for SEO crawlers -->
     <noscript>
       <h1>Art Avenue Studio — 3D Моделирование и Визуализация на Заказ</h1>
-      <p>Студия 3D моделирования и визуализации. Заказать 3д модели, 3д модельки, архитектурную визуализацию, дизайн интерьеров. Работаем с Unreal Engine 5, Blender, 3ds Max, ZBrush, Substance Painter.</p>
+      <p>Студия 3D моделирования и визуализации. Заказать 3д модели, 3д модельки, архитектурную визуализацию, дизайн интерьеров. Работаем с клиентами из любого города. Unreal Engine 5, Blender, 3ds Max, ZBrush, Substance Painter.</p>
       <h2>Наши услуги:</h2>
       <ul>
         <li>3D Моделирование — 3д модельки на заказ для игр, архитектуры, рекламы</li>
@@ -179,7 +166,7 @@
         <li>Game Dev 3D ассеты — оружие, транспорт, окружение для Unreal Engine 5 и Unity</li>
         <li>Hard Surface моделирование — механические 3д модели с PBR текстурами</li>
       </ul>
-      <p>Москва. Контакты: hello@artavenue.com</p>
+      <p>Контакты: hello@artavenue.com</p>
     </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
