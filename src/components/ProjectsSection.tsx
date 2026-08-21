@@ -95,19 +95,25 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ onSelectProjec
             <div
               onClick={() => onSelectProject(project)}
               className="relative rounded-2xl overflow-hidden bg-[#1e2020] shadow-2xl border border-white/5 cursor-pointer transition-all hover:border-white/20"
+              style={{ minHeight: '260px' }}
             >
-              {/* Project Image Box */}
-              <div
-                className="aspect-[4/3] w-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-                style={{ backgroundImage: `url('${project.imageUrl}')` }}
-              ></div>
+              {/* Project Image Box — using <img> for reliable mobile rendering */}
+              <div className="w-full overflow-hidden" style={{ aspectRatio: '4/3' }}>
+                <img
+                  src={project.imageUrl}
+                  alt={project.title}
+                  loading="lazy"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  style={{ display: 'block', minHeight: '180px' }}
+                />
+              </div>
 
               {/* Gradient Mask */}
               <div className="absolute inset-0 bg-gradient-to-t from-[#121414] via-[#121414]/40 to-transparent pointer-events-none opacity-90"></div>
 
               {/* Card Content Overlay */}
-              <div className="absolute bottom-0 left-0 p-6 md:p-8 w-full">
-                <div className="flex flex-col items-start gap-4">
+              <div className="absolute bottom-0 left-0 p-5 md:p-8 w-full">
+                <div className="flex flex-col items-start gap-3">
                   {/* Category Tags */}
                   <div className="flex flex-wrap gap-2">
                     {project.tags.map((tag, idx) => (
@@ -122,7 +128,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ onSelectProjec
 
                   {/* Title & Short Description */}
                   <div>
-                    <h3 className="text-xl md:text-2xl text-[#e2e2e2] font-semibold mb-2 group-hover:text-[#adc6ff] transition-colors">
+                    <h3 className="text-lg md:text-2xl text-[#e2e2e2] font-semibold mb-1 group-hover:text-[#adc6ff] transition-colors">
                       {project.title}
                     </h3>
                     <p className="text-sm text-[#c4c7c7] line-clamp-2 leading-relaxed">
@@ -131,7 +137,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ onSelectProjec
                   </div>
 
                   {/* Learn More Trigger */}
-                  <div className="inline-flex items-center gap-2 mt-2 text-xs font-semibold uppercase tracking-widest text-[#adc6ff] group-hover:text-white transition-colors">
+                  <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-[#adc6ff] group-hover:text-white transition-colors">
                     <span>ПОДРОБНЕЕ</span>
                     <span className="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">
                       arrow_forward

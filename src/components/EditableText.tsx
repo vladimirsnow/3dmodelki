@@ -4,7 +4,7 @@ import { useAdmin } from '../context/AdminContext';
 interface EditableTextProps {
   value: string;
   onSave: (newVal: string) => Promise<boolean>;
-  tag?: keyof JSX.IntrinsicElements;
+  tag?: keyof React.JSX.IntrinsicElements;
   className?: string;
   multiline?: boolean;
 }
