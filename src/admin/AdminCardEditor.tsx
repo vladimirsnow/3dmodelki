@@ -97,6 +97,17 @@ export const AdminCardEditor: React.FC<AdminCardEditorProps> = ({ project, onClo
                   </label>
                 </div>
               </div>
+
+              <div>
+                <label className="block mb-1">Доп. ракурс (URL)</label>
+                <div className="flex gap-2">
+                  <input type="text" name="secondaryImageUrl" value={formData.secondaryImageUrl || ''} onChange={handleChange} className="w-full bg-black/50 border border-white/10 rounded p-2 text-white" />
+                  <label className="bg-[#4b8eff] text-black px-4 py-2 rounded cursor-pointer font-semibold whitespace-nowrap">
+                    Загрузить
+                    <input type="file" accept="image/*" className="hidden" onChange={(e) => handleFileUpload(e, 'secondaryImageUrl')} />
+                  </label>
+                </div>
+              </div>
               
               <div>
                 <label className="block mb-1">3D Модель (URL - GLB/GLTF)</label>
