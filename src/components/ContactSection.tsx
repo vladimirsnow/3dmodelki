@@ -44,13 +44,28 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
     }
   }, [initialService, initialBudget, initialDetails]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      
       setSubmitted(true);
-    }, 800);
+    } catch (error) {
+      console.error('Submission error:', error);
+      alert('Не удалось отправить сообщение. Пожалуйста, попробуйте позже или свяжитесь с нами по email.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -152,6 +167,20 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="ваша@почта.com"
+                    className="w-full bg-[#333535] border border-white/10 p-4 rounded-xl text-[#e2e2e2] focus:ring-2 focus:ring-[#4b8eff]/50 focus:border-[#4b8eff] transition-all placeholder:text-[#c4c7c7]/50 outline-none text-sm"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs text-[#c4c7c7] uppercase tracking-widest font-semibold block">
+                    Телефон или Telegram
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.phone || ''}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    placeholder="+7 999 000 00 00 / @username"
                     className="w-full bg-[#333535] border border-white/10 p-4 rounded-xl text-[#e2e2e2] focus:ring-2 focus:ring-[#4b8eff]/50 focus:border-[#4b8eff] transition-all placeholder:text-[#c4c7c7]/50 outline-none text-sm"
                   />
                 </div>

@@ -273,6 +273,152 @@ app.get('/api/tech_stack', async (req, res) => {
   }
 });
 
+// --- TELEGRAM BOT LOGIC ---
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
+
+async function sendTelegramMessage(chatId: string | number, text: string) {
+  if (!TELEGRAM_BOT_TOKEN) {
+    console.warn('TELEGRAM_BOT_TOKEN not configured. Skipping message:', text);
+    return;
+  }
+  try {
+    const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' })
+    });
+    if (!response.ok) {
+      console.error('Telegram API error:', await response.text());
+    }
+  } catch (err) {
+    console.error('Failed to send Telegram message:', err);
+  }
+}
+
+// Contact form submission
+app.post('/api/contact', async (req, res) => {
+  const { name, email, phone, serviceType, budget, details } = req.body;
+  if (!name || !email) {
+    return res.status(400).json({ error: 'Name and email are required' });
+  }
+
+  try {
+    // 1. Get chat IDs and order counter from settings
+    const settingsResult = await db.execute("SELECT key, value FROM settings WHERE key IN ('telegramChatIds', 'orderCounter')");
+    
+    let chatIds: string[] = [];
+    let orderCounter = 0;
+
+    for (const row of settingsResult.rows) {
+      if (row.key === 'telegramChatIds') {
+        try { chatIds = JSON.parse(row.value as string); } catch (e) {}
+      } else if (row.key === 'orderCounter') {
+        orderCounter = parseInt(row.value as string, 10) || 0;
+      }
+    }
+
+    // 2. Increment order counter
+    const newOrderId = orderCounter + 1;
+    await db.execute({
+      sql: "INSERT INTO settings (key, value) VALUES ('orderCounter', ?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",
+      args: [newOrderId.toString()]
+    });
+
+    // 3. Format message
+    const message = `
+🌟 <b>Заказ #${newOrderId}</b>
+
+👤 <b>Имя:</b> ${sanitize(name, 100)}
+📧 <b>Email:</b> ${sanitize(email, 100)}
+📞 <b>Контакт:</b> ${phone ? sanitize(phone, 100) : '<i>Не указан</i>'}
+
+📝 <b>Детали проекта:</b>
+${sanitize(details || 'Нет деталей', 2000)}
+    `.trim();
+
+    // 4. Send to all subscribed managers
+    for (const chatId of chatIds) {
+      await sendTelegramMessage(chatId, message);
+    }
+
+    res.json({ success: true, message: 'Заявка отправлена' });
+  } catch (err) {
+    console.error('Contact submission error:', err);
+    res.status(500).json({ error: 'Failed to process request' });
+  }
+});
+
+// Telegram Webhook for Bot commands
+app.post('/api/telegram/webhook', async (req, res) => {
+  const { message } = req.body;
+  
+  // Acknowledge quickly to Telegram
+  res.status(200).send('OK');
+
+  if (!message || !message.text) return;
+
+  const chatId = message.chat.id.toString();
+  const text = message.text.trim();
+
+  try {
+    const settingsResult = await db.execute("SELECT value FROM settings WHERE key = 'telegramChatIds'");
+    let chatIds: string[] = [];
+    if (settingsResult.rows.length > 0) {
+      try {
+        chatIds = JSON.parse(settingsResult.rows[0].value as string);
+      } catch (e) {}
+    }
+
+    const isAdmin = chatIds.includes(chatId);
+
+    if (text.startsWith('/start')) {
+      let reply = `Привет! Ваш Chat ID: <code>${chatId}</code>\n\n`;
+      if (isAdmin) {
+        reply += `Вы подписаны на уведомления.\nДоступные команды:\n/add &lt;ID&gt; - добавить пользователя\n/remove &lt;ID&gt; - удалить пользователя\n/list - список получателей`;
+      } else {
+        reply += `Передайте этот ID администратору, чтобы он добавил вас в список получателей уведомлений о заказах.`;
+      }
+      await sendTelegramMessage(chatId, reply);
+    } 
+    else if (text.startsWith('/list') && isAdmin) {
+      await sendTelegramMessage(chatId, `Список получателей заявок:\n\n${chatIds.map(id => `• <code>${id}</code>`).join('\n')}`);
+    }
+    else if (text.startsWith('/add ') && isAdmin) {
+      const newId = text.split(' ')[1];
+      if (newId && !isNaN(Number(newId))) {
+        if (!chatIds.includes(newId)) {
+          chatIds.push(newId);
+          await db.execute({
+            sql: "INSERT INTO settings (key, value) VALUES ('telegramChatIds', ?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",
+            args: [JSON.stringify(chatIds)]
+          });
+          await sendTelegramMessage(chatId, `ID ${newId} успешно добавлен.`);
+          await sendTelegramMessage(newId, `Вы были добавлены в список получателей заявок.`);
+        } else {
+          await sendTelegramMessage(chatId, `Этот ID уже есть в списке.`);
+        }
+      } else {
+        await sendTelegramMessage(chatId, `Неверный формат. Используйте: /add 123456789`);
+      }
+    }
+    else if (text.startsWith('/remove ') && isAdmin) {
+      const rmId = text.split(' ')[1];
+      if (chatIds.includes(rmId)) {
+        chatIds = chatIds.filter(id => id !== rmId);
+        await db.execute({
+          sql: "UPDATE settings SET value = ? WHERE key = 'telegramChatIds'",
+          args: [JSON.stringify(chatIds)]
+        });
+        await sendTelegramMessage(chatId, `ID ${rmId} удален.`);
+      } else {
+        await sendTelegramMessage(chatId, `ID не найден.`);
+      }
+    }
+  } catch (err) {
+    console.error('Telegram webhook error:', err);
+  }
+});
+
 // --- UPLOAD ROUTE (VERCEL BLOB) ---
 app.post('/api/upload', requireAuth, upload.single('file'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
