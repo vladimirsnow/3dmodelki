@@ -276,16 +276,20 @@ app.get('/api/tech_stack', async (req, res) => {
 // --- TELEGRAM BOT LOGIC ---
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
 
-async function sendTelegramMessage(chatId: string | number, text: string) {
+async function sendTelegramMessage(chatId: string | number, text: string, replyMarkup?: any) {
   if (!TELEGRAM_BOT_TOKEN) {
     console.warn('TELEGRAM_BOT_TOKEN not configured. Skipping message:', text);
     return;
   }
   try {
+    const body: any = { chat_id: chatId, text, parse_mode: 'HTML' };
+    if (replyMarkup) {
+      body.reply_markup = replyMarkup;
+    }
     const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' })
+      body: JSON.stringify(body)
     });
     if (!response.ok) {
       console.error('Telegram API error:', await response.text());
@@ -303,15 +307,18 @@ app.post('/api/contact', async (req, res) => {
   }
 
   try {
-    // 1. Get chat IDs and order counter from settings
+    // 1. Get chat IDs and order counter from settings (with robust fallbacks)
     const settingsResult = await db.execute("SELECT key, value FROM settings WHERE key IN ('telegramChatIds', 'orderCounter')");
     
-    let chatIds: string[] = [];
+    let chatIds: string[] = ['6778470996']; // Fallback default
     let orderCounter = 0;
 
     for (const row of settingsResult.rows) {
       if (row.key === 'telegramChatIds') {
-        try { chatIds = JSON.parse(row.value as string); } catch (e) {}
+        try { 
+          const val = JSON.parse(row.value as string);
+          if (Array.isArray(val) && val.length > 0) chatIds = val;
+        } catch (e) {}
       } else if (row.key === 'orderCounter') {
         orderCounter = parseInt(row.value as string, 10) || 0;
       }
@@ -361,27 +368,72 @@ app.post('/api/telegram/webhook', async (req, res) => {
   const text = message.text.trim();
 
   try {
-    const settingsResult = await db.execute("SELECT value FROM settings WHERE key = 'telegramChatIds'");
-    let chatIds: string[] = [];
-    if (settingsResult.rows.length > 0) {
-      try {
-        chatIds = JSON.parse(settingsResult.rows[0].value as string);
-      } catch (e) {}
+    const settingsResult = await db.execute("SELECT key, value FROM settings WHERE key IN ('telegramChatIds', 'telegramAdmins')");
+    let chatIds: string[] = ['6778470996'];
+    let adminIds: string[] = ['6778470996'];
+
+    for (const row of settingsResult.rows) {
+      if (row.key === 'telegramChatIds') {
+        try {
+          const val = JSON.parse(row.value as string);
+          if (Array.isArray(val) && val.length > 0) chatIds = val;
+        } catch (e) {}
+      } else if (row.key === 'telegramAdmins') {
+        try {
+          const val = JSON.parse(row.value as string);
+          if (Array.isArray(val) && val.length > 0) adminIds = val;
+        } catch (e) {}
+      }
     }
 
-    const isAdmin = chatIds.includes(chatId);
+    const isAdmin = adminIds.includes(chatId);
 
-    if (text.startsWith('/start')) {
+    // Keyboard configuration for admins
+    const adminKeyboard = {
+      keyboard: [
+        [{ text: '📋 Получатели' }, { text: '🔑 Админы' }],
+        [{ text: '➕ Инструкция по добавлению' }]
+      ],
+      resize_keyboard: true
+    };
+
+    if (text.startsWith('/start') || text === 'меню' || text === '/menu') {
       let reply = `Привет! Ваш Chat ID: <code>${chatId}</code>\n\n`;
       if (isAdmin) {
-        reply += `Вы подписаны на уведомления.\nДоступные команды:\n/add &lt;ID&gt; - добавить пользователя\n/remove &lt;ID&gt; - удалить пользователя\n/list - список получателей`;
+        reply += `Вы являетесь Администратором бота.\nИспользуйте клавиатуру ниже для быстрой навигации или отправляйте команды текстом.`;
+        await sendTelegramMessage(chatId, reply, adminKeyboard);
       } else {
-        reply += `Передайте этот ID администратору, чтобы он добавил вас в список получателей уведомлений о заказах.`;
+        reply += `Вы не зарегистрированы как администратор. Передайте ваш ID владельцу бота.`;
+        await sendTelegramMessage(chatId, reply);
       }
-      await sendTelegramMessage(chatId, reply);
     } 
-    else if (text.startsWith('/list') && isAdmin) {
-      await sendTelegramMessage(chatId, `Список получателей заявок:\n\n${chatIds.map(id => `• <code>${id}</code>`).join('\n')}`);
+    else if ((text === '📋 Получатели' || text.startsWith('/list')) && isAdmin) {
+      await sendTelegramMessage(chatId, `<b>Список получателей заявок:</b>\n\n${chatIds.map(id => `• <code>${id}</code>`).join('\n')}`, adminKeyboard);
+    }
+    else if ((text === '🔑 Админы' || text.startsWith('/listadmins')) && isAdmin) {
+      await sendTelegramMessage(chatId, `<b>Список администраторов бота:</b>\n\n${adminIds.map(id => `• <code>${id}</code>`).join('\n')}`, adminKeyboard);
+    }
+    else if (text === '➕ Инструкция по добавлению' && isAdmin) {
+      const instr = `
+💡 <b>Как управлять ботом:</b>
+
+1. Чтобы <b>добавить получателя</b> заявок:
+Отправьте боту команду:
+<code>/add 123456789</code>
+
+2. Чтобы <b>удалить получателя</b>:
+Отправьте боту команду:
+<code>/remove 123456789</code>
+
+3. Чтобы <b>добавить нового Администратора</b>:
+Отправьте команду:
+<code>/addadmin 123456789</code>
+
+4. Чтобы <b>удалить Администратора</b>:
+Отправьте команду:
+<code>/removeadmin 123456789</code>
+      `.trim();
+      await sendTelegramMessage(chatId, instr, adminKeyboard);
     }
     else if (text.startsWith('/add ') && isAdmin) {
       const newId = text.split(' ')[1];
@@ -392,13 +444,13 @@ app.post('/api/telegram/webhook', async (req, res) => {
             sql: "INSERT INTO settings (key, value) VALUES ('telegramChatIds', ?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",
             args: [JSON.stringify(chatIds)]
           });
-          await sendTelegramMessage(chatId, `ID ${newId} успешно добавлен.`);
-          await sendTelegramMessage(newId, `Вы были добавлены в список получателей заявок.`);
+          await sendTelegramMessage(chatId, `ID ${newId} успешно добавлен в список получателей заявок.`, adminKeyboard);
+          await sendTelegramMessage(newId, `Вы были добавлены в список получателей заявок на сайте.`);
         } else {
-          await sendTelegramMessage(chatId, `Этот ID уже есть в списке.`);
+          await sendTelegramMessage(chatId, `Этот ID уже есть в списке получателей.`, adminKeyboard);
         }
       } else {
-        await sendTelegramMessage(chatId, `Неверный формат. Используйте: /add 123456789`);
+        await sendTelegramMessage(chatId, `Неверный формат. Используйте: /add 123456789`, adminKeyboard);
       }
     }
     else if (text.startsWith('/remove ') && isAdmin) {
@@ -406,12 +458,46 @@ app.post('/api/telegram/webhook', async (req, res) => {
       if (chatIds.includes(rmId)) {
         chatIds = chatIds.filter(id => id !== rmId);
         await db.execute({
-          sql: "UPDATE settings SET value = ? WHERE key = 'telegramChatIds'",
+          sql: "INSERT INTO settings (key, value) VALUES ('telegramChatIds', ?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",
           args: [JSON.stringify(chatIds)]
         });
-        await sendTelegramMessage(chatId, `ID ${rmId} удален.`);
+        await sendTelegramMessage(chatId, `ID ${rmId} удален из получателей.`, adminKeyboard);
       } else {
-        await sendTelegramMessage(chatId, `ID не найден.`);
+        await sendTelegramMessage(chatId, `ID не найден в списке получателей.`, adminKeyboard);
+      }
+    }
+    else if (text.startsWith('/addadmin ') && isAdmin) {
+      const newAdminId = text.split(' ')[1];
+      if (newAdminId && !isNaN(Number(newAdminId))) {
+        if (!adminIds.includes(newAdminId)) {
+          adminIds.push(newAdminId);
+          await db.execute({
+            sql: "INSERT INTO settings (key, value) VALUES ('telegramAdmins', ?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",
+            args: [JSON.stringify(adminIds)]
+          });
+          await sendTelegramMessage(chatId, `Администратор ${newAdminId} успешно добавлен.`, adminKeyboard);
+          await sendTelegramMessage(newAdminId, `Вы были назначены администратором бота. Напишите /start, чтобы активировать меню.`, adminKeyboard);
+        } else {
+          await sendTelegramMessage(chatId, `Этот ID уже является администратором.`, adminKeyboard);
+        }
+      } else {
+        await sendTelegramMessage(chatId, `Неверный формат. Используйте: /addadmin 123456789`, adminKeyboard);
+      }
+    }
+    else if (text.startsWith('/removeadmin ') && isAdmin) {
+      const rmAdminId = text.split(' ')[1];
+      if (rmAdminId === '6778470996') {
+        return await sendTelegramMessage(chatId, `Нельзя удалить главного создателя бота из админов!`, adminKeyboard);
+      }
+      if (adminIds.includes(rmAdminId)) {
+        adminIds = adminIds.filter(id => id !== rmAdminId);
+        await db.execute({
+          sql: "INSERT INTO settings (key, value) VALUES ('telegramAdmins', ?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",
+          args: [JSON.stringify(adminIds)]
+        });
+        await sendTelegramMessage(chatId, `Администратор ${rmAdminId} удален.`, adminKeyboard);
+      } else {
+        await sendTelegramMessage(chatId, `Администратор не найден.`, adminKeyboard);
       }
     }
   } catch (err) {
