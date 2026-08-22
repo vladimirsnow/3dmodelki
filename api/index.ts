@@ -299,6 +299,29 @@ async function sendTelegramMessage(chatId: string | number, text: string, replyM
   }
 }
 
+async function getTelegramUserInfo(chatId: string | number): Promise<string> {
+  if (!TELEGRAM_BOT_TOKEN) return `<code>${chatId}</code>`;
+  try {
+    const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getChat?chat_id=${chatId}`);
+    if (response.ok) {
+      const data = await response.json();
+      if (data.ok && data.result) {
+        const u = data.result;
+        let name = '';
+        if (u.first_name) name += u.first_name;
+        if (u.last_name) name += ' ' + u.last_name;
+        if (u.username) name += ` (@${u.username})`;
+        if (name) {
+          return `<code>${chatId}</code> (${sanitize(name.trim(), 100)})`;
+        }
+      }
+    }
+  } catch (err) {
+    console.error('getChat error:', err);
+  }
+  return `<code>${chatId}</code>`;
+}
+
 // Contact form submission
 app.post('/api/contact', async (req, res) => {
   const { name, email, phone, serviceType, budget, details } = req.body;
@@ -423,10 +446,12 @@ app.post('/api/telegram/webhook', async (req, res) => {
       }
     } 
     else if ((command === '📋 Получатели' || command.startsWith('/list')) && isAdmin) {
-      await sendTelegramMessage(chatId, `<b>Список получателей заявок:</b>\n\n${chatIds.map(id => `• <code>${id}</code>`).join('\n')}`, adminKeyboard);
+      const formatted = await Promise.all(chatIds.map(id => getTelegramUserInfo(id)));
+      await sendTelegramMessage(chatId, `<b>Список получателей заявок:</b>\n\n${formatted.map(info => `• ${info}`).join('\n')}`, adminKeyboard);
     }
     else if ((command === '🔑 Админы' || command.startsWith('/listadmins')) && isAdmin) {
-      await sendTelegramMessage(chatId, `<b>Список администраторов бота:</b>\n\n${adminIds.map(id => `• <code>${id}</code>`).join('\n')}`, adminKeyboard);
+      const formatted = await Promise.all(adminIds.map(id => getTelegramUserInfo(id)));
+      await sendTelegramMessage(chatId, `<b>Список администраторов бота:</b>\n\n${formatted.map(info => `• ${info}`).join('\n')}`, adminKeyboard);
     }
     // BUTTON PROMPTS (Force Reply)
     else if (command === '➕ Добавить получателя' && isAdmin) {
