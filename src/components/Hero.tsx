@@ -77,7 +77,8 @@ export const Hero: React.FC<HeroProps> = ({ onExploreProjects }) => {
       </div>
 
       {/* Quick Metrics Bar */}
-      <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-4 pt-12 border-t border-white/10 mt-16 relative z-10">
+      <div className="max-w-[1440px] mx-auto w-full px-5 md:px-16 relative z-10 mt-16">
+        <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-4 pt-12 border-t border-white/10">
         <div className="flex flex-col">
           <EditableText
             tag="span"
@@ -134,6 +135,7 @@ export const Hero: React.FC<HeroProps> = ({ onExploreProjects }) => {
             onSave={async (val) => await updateSetting('heroMetric4Label', val)}
           />
         </div>
+      </div>
       </div>
     </section>
   );
