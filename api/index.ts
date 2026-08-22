@@ -358,11 +358,10 @@ ${sanitize(details || 'Нет деталей', 2000)}
 // Telegram Webhook for Bot commands
 app.post('/api/telegram/webhook', async (req, res) => {
   const { message } = req.body;
-  
-  // Acknowledge quickly to Telegram
-  res.status(200).send('OK');
 
-  if (!message || !message.text) return;
+  if (!message || !message.text) {
+    return res.status(200).send('OK');
+  }
 
   const chatId = message.chat.id.toString();
   const text = message.text.trim();
@@ -508,8 +507,12 @@ app.post('/api/telegram/webhook', async (req, res) => {
         await sendTelegramMessage(chatId, `⚠️ Администратор не найден.`, adminKeyboard);
       }
     }
+    
+    // Send OK to Telegram only after all async work is done
+    res.status(200).send('OK');
   } catch (err) {
     console.error('Telegram webhook error:', err);
+    res.status(500).send('Error');
   }
 });
 
