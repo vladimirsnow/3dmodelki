@@ -17,6 +17,8 @@ npm-debug.log*
 .env
 .env.local
 .env.production
+.env.vercel
+.env.production.local
 !.env.example
 
 # Database (содержит хэши паролей)
@@ -37,3 +39,5 @@ public/uploads/*
 
 # Coverage
 coverage/
+
+.vercel

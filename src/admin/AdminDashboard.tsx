@@ -1,12 +1,42 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Plus, Trash2, Upload } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext';
 import { useData } from '../context/DataContext';
+
+type ShowcaseService = {
+  id: string;
+  title: string;
+  description: string;
+  icon: 'box' | 'house' | 'sparkles' | 'clapperboard';
+  price: string;
+};
+
+const defaultShowcaseServices: ShowcaseService[] = [
+  { id: 'product', title: '3D-моделирование продуктов', description: 'Предметные модели для каталогов, маркетплейсов, презентаций и рекламы.', icon: 'box', price: 'от 25 000 ₽' },
+  { id: 'architecture', title: 'Архитектурная визуализация', description: 'Интерьеры, экстерьеры и атмосферные ракурсы, которые продают идею до строительства.', icon: 'house', price: 'от 1 500 ₽ / м²' },
+  { id: 'game', title: 'Игровые ассеты', description: 'Оптимизированные модели, окружение и материалы для Unity, Unreal Engine и модов.', icon: 'sparkles', price: 'от 18 000 ₽' },
+  { id: 'animation', title: '3D-анимация и ролики', description: 'Динамичные продуктовые ролики, заставки и визуальные истории для брендов.', icon: 'clapperboard', price: 'от 40 000 ₽' },
+];
+
+function readShowcaseServices(value?: string): ShowcaseService[] {
+  if (!value) return defaultShowcaseServices;
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) && parsed.length ? parsed : defaultShowcaseServices;
+  } catch {
+    return defaultShowcaseServices;
+  }
+}
 
 export const AdminDashboard: React.FC = () => {
   const { logout, isAdminMode, setIsAdminMode } = useAdmin();
   const { settings, updateSetting } = useData();
   
   const [savingContacts, setSavingContacts] = useState(false);
+  const [showcaseServices, setShowcaseServices] = useState<ShowcaseService[]>(() => readShowcaseServices(settings.showcaseServicesData));
+  const [modelUrl, setModelUrl] = useState(settings.showcaseModelUrl || 'https://modelviewer.dev/shared-assets/models/Astronaut.glb');
+  const [savingShowcase, setSavingShowcase] = useState(false);
+  const [uploadingModel, setUploadingModel] = useState(false);
   const [contacts, setContacts] = useState({
     contactEmail: settings.contactEmail || 'hello@artavenue.com',
     contactAddress: settings.contactAddress || 'Москва, Кутузовский пр-т, 12',
@@ -17,6 +47,67 @@ export const AdminDashboard: React.FC = () => {
 
   const handleContactChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setContacts(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  useEffect(() => {
+    setShowcaseServices(readShowcaseServices(settings.showcaseServicesData));
+  }, [settings.showcaseServicesData]);
+
+  useEffect(() => {
+    if (settings.showcaseModelUrl) setModelUrl(settings.showcaseModelUrl);
+  }, [settings.showcaseModelUrl]);
+
+  const updateShowcaseService = (index: number, field: keyof ShowcaseService, value: string) => {
+    setShowcaseServices((current) => current.map((service, serviceIndex) => (
+      serviceIndex === index ? { ...service, [field]: value } as ShowcaseService : service
+    )));
+  };
+
+  const addShowcaseService = () => {
+    setShowcaseServices((current) => [
+      ...current,
+      {
+        id: `service-${Date.now()}`,
+        title: 'Новая услуга',
+        description: 'Кратко опишите, какую задачу решает эта услуга.',
+        icon: 'box',
+        price: 'от 0 ₽',
+      },
+    ]);
+  };
+
+  const removeShowcaseService = (index: number) => {
+    setShowcaseServices((current) => current.filter((_, serviceIndex) => serviceIndex !== index));
+  };
+
+  const saveShowcase = async () => {
+    setSavingShowcase(true);
+    const [servicesSaved, modelSaved] = await Promise.all([
+      updateSetting('showcaseServicesData', JSON.stringify(showcaseServices)),
+      updateSetting('showcaseModelUrl', modelUrl.trim()),
+    ]);
+    setSavingShowcase(false);
+    alert(servicesSaved && modelSaved ? 'Услуги и 3D-модель сохранены.' : 'Не удалось сохранить изменения.');
+  };
+
+  const uploadModel = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setUploadingModel(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const response = await fetch('/api/upload', { method: 'POST', body: formData });
+      const payload = await response.json();
+      if (!response.ok || !payload.url) throw new Error('Upload failed');
+      setModelUrl(payload.url);
+    } catch {
+      alert('Не удалось загрузить модель. Используйте прямую ссылку на .glb или повторите загрузку.');
+    } finally {
+      setUploadingModel(false);
+      event.target.value = '';
+    }
   };
 
   const handleSaveContacts = async (e: React.FormEvent) => {
@@ -112,6 +203,55 @@ export const AdminDashboard: React.FC = () => {
             </form>
           </div>
         </div>
+
+        <section className="mt-6 border border-white/10 bg-[#1a1c1c] p-6">
+          <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="text-xl font-bold">Услуги и 3D-сцена главной страницы</h2>
+              <p className="mt-1 text-sm text-[#c4c7c7]">Здесь меняются карточки в блоке «Наши услуги» и модель в интерактивном окне.</p>
+            </div>
+            <button type="button" onClick={addShowcaseService} className="inline-flex items-center justify-center gap-2 border border-[#4b8eff]/50 px-4 py-2 text-sm text-[#adc6ff] hover:bg-[#4b8eff]/10">
+              <Plus className="h-4 w-4" /> Добавить услугу
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            {showcaseServices.map((service, index) => (
+              <div key={service.id} className="grid gap-3 border border-white/10 bg-black/20 p-4 md:grid-cols-2">
+                <input value={service.title} onChange={(event) => updateShowcaseService(index, 'title', event.target.value)} aria-label="Название услуги" className="bg-black/40 border border-white/10 p-2 text-sm text-white outline-none focus:border-[#4b8eff]" placeholder="Название услуги" />
+                <div className="flex gap-3">
+                  <input value={service.price} onChange={(event) => updateShowcaseService(index, 'price', event.target.value)} aria-label="Стоимость услуги" className="min-w-0 flex-1 bg-black/40 border border-white/10 p-2 text-sm text-white outline-none focus:border-[#4b8eff]" placeholder="Стоимость" />
+                  <select value={service.icon} onChange={(event) => updateShowcaseService(index, 'icon', event.target.value)} aria-label="Иконка услуги" className="bg-black/40 border border-white/10 px-2 text-sm text-white outline-none focus:border-[#4b8eff]">
+                    <option value="box">Продукт</option>
+                    <option value="house">Архитектура</option>
+                    <option value="sparkles">Game Dev</option>
+                    <option value="clapperboard">Анимация</option>
+                  </select>
+                  <button type="button" onClick={() => removeShowcaseService(index)} className="border border-red-400/30 p-2 text-red-300 hover:bg-red-500/10" title="Удалить услугу" aria-label="Удалить услугу">
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+                <textarea value={service.description} onChange={(event) => updateShowcaseService(index, 'description', event.target.value)} aria-label="Описание услуги" className="min-h-20 bg-black/40 border border-white/10 p-2 text-sm text-white outline-none focus:border-[#4b8eff] md:col-span-2" placeholder="Описание услуги" />
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-6 border-t border-white/10 pt-6">
+            <label className="mb-2 block text-sm font-semibold">3D-модель для окна</label>
+            <p className="mb-3 text-xs text-[#c4c7c7]">Поддерживается ссылка или файл в формате GLB. После загрузки сохраните изменения.</p>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <input type="url" value={modelUrl} onChange={(event) => setModelUrl(event.target.value)} className="min-w-0 flex-1 bg-black/40 border border-white/10 p-2 text-sm text-white outline-none focus:border-[#4b8eff]" placeholder="https://.../model.glb" />
+              <label className="inline-flex cursor-pointer items-center justify-center gap-2 border border-white/15 px-4 py-2 text-sm hover:bg-white/5">
+                <Upload className="h-4 w-4" /> {uploadingModel ? 'Загрузка...' : 'Загрузить GLB'}
+                <input type="file" accept=".glb,model/gltf-binary" onChange={uploadModel} className="hidden" disabled={uploadingModel} />
+              </label>
+            </div>
+          </div>
+
+          <button type="button" onClick={saveShowcase} disabled={savingShowcase || uploadingModel} className="mt-6 w-full bg-[#4b8eff] py-3 font-bold text-[#00285c] hover:brightness-110 disabled:opacity-50">
+            {savingShowcase ? 'Сохранение...' : 'Сохранить услуги и 3D-модель'}
+          </button>
+        </section>
       </div>
     </div>
   );

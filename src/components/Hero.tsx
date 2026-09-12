@@ -3,10 +3,10 @@ import { EditableText } from './EditableText';
 import { useData } from '../context/DataContext';
 
 interface HeroProps {
-  onExploreProjects: () => void;
+  onExploreServices: () => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onExploreProjects }) => {
+export const Hero: React.FC<HeroProps> = ({ onExploreServices }) => {
   const { settings, updateSetting, loading } = useData();
 
   if (loading) return <div className="h-screen w-full flex items-center justify-center">Загрузка...</div>;
@@ -63,14 +63,14 @@ export const Hero: React.FC<HeroProps> = ({ onExploreProjects }) => {
         {/* Hero CTA buttons */}
         <div className="flex flex-col sm:flex-row gap-4 pt-4 w-full sm:w-auto">
           <a
-            href="#portfolio"
+            href="#services"
             onClick={(e) => {
               e.preventDefault();
-              onExploreProjects();
+              onExploreServices();
             }}
             className="w-full sm:w-auto bg-[#4b8eff] text-[#00285c] px-8 py-4 rounded-xl font-semibold text-xs tracking-wider uppercase text-center flex items-center justify-center gap-2 hover:brightness-110 active:scale-95 transition-all shadow-[0_0_20px_rgba(75,142,255,0.4)] cursor-pointer backdrop-blur-md"
           >
-            <span>СМОТРЕТЬ РАБОТЫ</span>
+            <span>НАШИ УСЛУГИ</span>
             <span className="material-symbols-outlined text-lg">arrow_downward</span>
           </a>
         </div>
@@ -78,7 +78,7 @@ export const Hero: React.FC<HeroProps> = ({ onExploreProjects }) => {
 
       {/* Quick Metrics Bar */}
       <div className="max-w-[1440px] mx-auto w-full px-5 md:px-16 relative z-10 mt-16">
-        <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-4 pt-12 border-t border-white/10">
+        <div className="w-full grid grid-cols-2 sm:grid-cols-3 gap-4 pt-12 border-t border-white/10">
         <div className="flex flex-col">
           <EditableText
             tag="span"
@@ -119,20 +119,6 @@ export const Hero: React.FC<HeroProps> = ({ onExploreProjects }) => {
             className="text-xs text-[#c4c7c7] uppercase tracking-wider mt-1"
             value={settings.heroMetric3Label || 'Lumen & Nanite'}
             onSave={async (val) => await updateSetting('heroMetric3Label', val)}
-          />
-        </div>
-        <div className="flex flex-col">
-          <EditableText
-            tag="span"
-            className="text-2xl sm:text-3xl font-bold text-[#e9c349]"
-            value={settings.heroMetric4Value || '100% PBR'}
-            onSave={async (val) => await updateSetting('heroMetric4Value', val)}
-          />
-          <EditableText
-            tag="span"
-            className="text-xs text-[#c4c7c7] uppercase tracking-wider mt-1"
-            value={settings.heroMetric4Label || 'Точность материалов'}
-            onSave={async (val) => await updateSetting('heroMetric4Label', val)}
           />
         </div>
       </div>

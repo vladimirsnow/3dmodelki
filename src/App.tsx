@@ -56,8 +56,8 @@ export default function App() {
       <main className="w-full pt-20 bg-[#121414] space-y-12 relative">
         {/* Hero Banner */}
         <Hero
-          onExploreProjects={() => {
-            const el = document.getElementById('portfolio');
+          onExploreServices={() => {
+            const el = document.getElementById('services');
             if (el) el.scrollIntoView({ behavior: 'smooth' });
           }}
         />

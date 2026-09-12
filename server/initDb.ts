@@ -7,7 +7,16 @@ const defaultSettings = [
   { key: 'linkBehance', value: 'https://behance.net' },
   { key: 'linkInstagram', value: 'https://instagram.com' },
   { key: 'linkVimeo', value: 'https://vimeo.com' },
-  { key: 'telegramChatIds', value: '["6778470996"]' }
+  { key: 'telegramChatIds', value: '["6778470996"]' },
+  { key: 'showcaseServicesTitle', value: 'Наши услуги' },
+  { key: 'showcaseServicesDescription', value: 'Берем на себя весь путь: от идеи и точной модели до финального кадра, анимации или готового игрового ассета.' },
+  { key: 'showcaseModelUrl', value: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb' },
+  { key: 'showcaseServicesData', value: JSON.stringify([
+    { id: 'product', title: '3D-моделирование продуктов', description: 'Предметные модели для каталогов, маркетплейсов, презентаций и рекламы.', icon: 'box', price: 'от 25 000 ₽' },
+    { id: 'architecture', title: 'Архитектурная визуализация', description: 'Интерьеры, экстерьеры и атмосферные ракурсы, которые продают идею до строительства.', icon: 'house', price: 'от 1 500 ₽ / м²' },
+    { id: 'game', title: 'Игровые ассеты', description: 'Оптимизированные модели, окружение и материалы для Unity, Unreal Engine и модов.', icon: 'sparkles', price: 'от 18 000 ₽' },
+    { id: 'animation', title: '3D-анимация и ролики', description: 'Динамичные продуктовые ролики, заставки и визуальные истории для брендов.', icon: 'clapperboard', price: 'от 40 000 ₽' },
+  ]) }
 ];
 
 const defaultProjects = [
@@ -145,6 +154,19 @@ const defaultTechStack = [
   { name: 'ZBrush / Houdini', percentage: 85, description: 'Органический скульптуринг высокой детализации и процедуры симуляции частиц, разрушений и сложных физических сред.' }
 ];
 
+async function ensureColumn(table: string, column: string, definition: string) {
+  const allowedTables = new Set(['admins', 'settings', 'projects', 'services', 'tech_stack']);
+  if (!allowedTables.has(table)) {
+    throw new Error(`Refusing to alter unknown table: ${table}`);
+  }
+
+  const info = await db.execute(`PRAGMA table_info(${table})`);
+  const exists = info.rows.some((row: any) => row.name === column);
+  if (!exists) {
+    await db.execute(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+  }
+}
+
 async function init() {
   try {
     // Admins table
@@ -213,6 +235,16 @@ async function init() {
         description TEXT NOT NULL
       )
     `);
+
+    await ensureColumn('admins', 'createdAt', 'DATETIME');
+    await ensureColumn('settings', 'updatedAt', 'DATETIME');
+    await ensureColumn('projects', 'createdAt', 'DATETIME');
+    await ensureColumn('projects', 'updatedAt', 'DATETIME');
+
+    await db.execute("UPDATE settings SET updatedAt = CURRENT_TIMESTAMP WHERE updatedAt IS NULL");
+    await db.execute("UPDATE projects SET createdAt = CURRENT_TIMESTAMP WHERE createdAt IS NULL");
+    await db.execute("UPDATE projects SET updatedAt = CURRENT_TIMESTAMP WHERE updatedAt IS NULL");
+    await db.execute("UPDATE admins SET createdAt = CURRENT_TIMESTAMP WHERE createdAt IS NULL");
 
     // Seed default admin if none exists
     const adminCheck = await db.execute("SELECT COUNT(*) as count FROM admins");

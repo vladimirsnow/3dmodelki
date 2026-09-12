@@ -17,7 +17,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenContactModal }) => {
 
   const navLinks = [
     { id: 'portfolio', label: 'Работы', href: '#portfolio' },
-    { id: 'tech-stack', label: 'Стек', href: '#tech-stack' },
+    { id: 'services', label: 'Услуги', href: '#services' },
     { id: 'about', label: 'О нас', href: '#about' },
     { id: 'contacts', label: 'Контакты', href: '#footer-contact' },
   ];
@@ -27,7 +27,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenContactModal }) => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
 
-      const sectionIds = ['portfolio', 'tech-stack', 'about', 'footer-contact'];
+      const sectionIds = ['portfolio', 'services', 'about', 'footer-contact'];
       const scrollPosition = window.scrollY + 200;
 
       for (let i = sectionIds.length - 1; i >= 0; i--) {
@@ -165,4 +165,3 @@ export const Header: React.FC<HeaderProps> = ({ onOpenContactModal }) => {
     </header>
   );
 };
-
