@@ -17,10 +17,10 @@ export const InteractiveModelViewer: FC<InteractiveModelViewerProps> = ({ modelU
 
     setError(null);
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color('#090c10');
+    scene.background = new THREE.Color('#080b10');
 
     const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
-    camera.position.set(2.8, 1.9, 4.8);
+    camera.position.set(0, 0.1, 5.2);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -37,27 +37,15 @@ export const InteractiveModelViewer: FC<InteractiveModelViewerProps> = ({ modelU
     controls.maxDistance = 9;
     controls.autoRotate = true;
     controls.autoRotateSpeed = 1.4;
-    controls.target.set(0, 0.65, 0);
+    controls.target.set(0, 0, 0);
 
-    scene.add(new THREE.HemisphereLight('#b8d5ff', '#142028', 2.6));
+    scene.add(new THREE.HemisphereLight('#d8e7ff', '#0e1520', 2.8));
     const keyLight = new THREE.DirectionalLight('#ffffff', 3.2);
-    keyLight.position.set(4, 5, 4);
+    keyLight.position.set(3, 4, 5);
     scene.add(keyLight);
     const rimLight = new THREE.DirectionalLight('#4b8eff', 4.5);
-    rimLight.position.set(-4, 2, -3);
+    rimLight.position.set(-4, 2, 1);
     scene.add(rimLight);
-
-    const floor = new THREE.Mesh(
-      new THREE.CircleGeometry(3.4, 64),
-      new THREE.MeshStandardMaterial({ color: '#101820', metalness: 0.35, roughness: 0.42 }),
-    );
-    floor.rotation.x = -Math.PI / 2;
-    floor.position.y = -1.1;
-    scene.add(floor);
-
-    const grid = new THREE.GridHelper(6, 18, '#285180', '#15283a');
-    grid.position.y = -1.08;
-    scene.add(grid);
 
     const loader = new GLTFLoader();
     loader.load(
@@ -70,7 +58,6 @@ export const InteractiveModelViewer: FC<InteractiveModelViewerProps> = ({ modelU
         const scale = 2.35 / (Math.max(size.x, size.y, size.z) || 1);
         model.scale.setScalar(scale);
         model.position.sub(center.multiplyScalar(scale));
-        model.position.y -= 0.95;
         scene.add(model);
       },
       undefined,
@@ -113,12 +100,17 @@ export const InteractiveModelViewer: FC<InteractiveModelViewerProps> = ({ modelU
   }, [modelUrl]);
 
   return (
-    <div className="relative h-full w-full overflow-hidden bg-[#090c10]">
+    <div className="relative h-full w-full overflow-hidden bg-[#080b10]">
       <div ref={containerRef} className="absolute inset-0" />
-      <div className="pointer-events-none absolute left-4 top-4 border border-white/10 bg-black/45 px-3 py-2 text-[10px] uppercase tracking-widest text-[#d7e4ff] backdrop-blur-sm">
-        3D preview
+      <div className="pointer-events-none absolute inset-3 border border-[#d7e4ff]/20" />
+      <div className="pointer-events-none absolute left-3 top-3 h-8 w-8 border-l-2 border-t-2 border-[#4b8eff]" />
+      <div className="pointer-events-none absolute right-3 top-3 h-8 w-8 border-r-2 border-t-2 border-[#4b8eff]" />
+      <div className="pointer-events-none absolute bottom-3 left-3 h-8 w-8 border-b-2 border-l-2 border-[#4b8eff]" />
+      <div className="pointer-events-none absolute bottom-3 right-3 h-8 w-8 border-b-2 border-r-2 border-[#4b8eff]" />
+      <div className="pointer-events-none absolute left-6 top-6 bg-[#080b10]/80 px-2 py-1 text-[10px] uppercase tracking-widest text-[#d7e4ff]">
+        3D объект
       </div>
-      <div className="pointer-events-none absolute bottom-4 left-4 border border-white/10 bg-black/45 px-3 py-2 text-[10px] text-[#c4c7c7] backdrop-blur-sm">
+      <div className="pointer-events-none absolute bottom-6 left-6 bg-[#080b10]/80 px-2 py-1 text-[10px] text-[#c4c7c7]">
         Тяните, чтобы вращать · колесо для масштаба
       </div>
       {error && (

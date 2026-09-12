@@ -9,6 +9,7 @@ type StudioService = {
   title: string;
   description: string;
   icon: 'box' | 'house' | 'sparkles' | 'clapperboard';
+  svgUrl?: string;
   price: string;
 };
 
@@ -35,6 +36,7 @@ export const TechStackSection: React.FC = () => {
   const { settings, updateSetting } = useData();
   const services = parseServices(settings.showcaseServicesData);
   const modelUrl = settings.showcaseModelUrl || 'https://modelviewer.dev/shared-assets/models/Astronaut.glb';
+  const scrollToContact = () => document.getElementById('footer-contact')?.scrollIntoView({ behavior: 'smooth' });
 
   return (
     <section id="services" className="max-w-[1440px] mx-auto px-5 md:px-16 pt-16">
@@ -59,19 +61,25 @@ export const TechStackSection: React.FC = () => {
             {services.map((service) => {
               const Icon = iconMap[service.icon] || Box;
               return (
-                <article key={service.id} className="border border-white/10 bg-[#1a1c1c] p-5 transition-colors hover:border-[#4b8eff]/60">
-                  <Icon className="mb-5 h-5 w-5 text-[#adc6ff]" aria-hidden="true" />
+                <button key={service.id} type="button" onClick={scrollToContact} className="border border-white/10 bg-[#1a1c1c] p-5 text-left transition-colors hover:border-[#4b8eff]/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4b8eff]">
+                  {service.svgUrl ? (
+                    <img src={service.svgUrl} alt="" className="mb-5 h-5 w-5 object-contain" />
+                  ) : (
+                    <Icon className="mb-5 h-5 w-5 text-[#adc6ff]" aria-hidden="true" />
+                  )}
                   <h3 className="text-base font-semibold text-white">{service.title}</h3>
                   <p className="mt-2 text-xs leading-relaxed text-[#aeb3b4]">{service.description}</p>
                   <p className="mt-5 text-xs font-semibold text-[#adc6ff]">{service.price}</p>
-                </article>
+                </button>
               );
             })}
           </div>
         </div>
 
-        <div className="min-h-[440px] overflow-hidden border border-white/10 bg-[#0c0f0f] shadow-2xl md:min-h-[560px]">
-          <InteractiveModelViewer modelUrl={modelUrl} />
+        <div className="w-full max-w-[680px] justify-self-center border border-[#4b8eff]/60 bg-[#080b10] p-2 shadow-2xl">
+          <div className="aspect-square overflow-hidden border border-white/10">
+            <InteractiveModelViewer modelUrl={modelUrl} />
+          </div>
         </div>
       </div>
     </section>

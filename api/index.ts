@@ -62,7 +62,7 @@ const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 50 * 1024 * 1024 }, // 50MB
   fileFilter: (req, file, cb) => {
-    const ALLOWED = ['.jpg', '.jpeg', '.png', '.webp', '.avif', '.glb'];
+    const ALLOWED = ['.jpg', '.jpeg', '.png', '.webp', '.avif', '.glb', '.svg'];
     const ext = path.extname(file.originalname).toLowerCase();
     if (!ALLOWED.includes(ext)) {
       return cb(new Error(`Недопустимый тип файла: ${ext}`));

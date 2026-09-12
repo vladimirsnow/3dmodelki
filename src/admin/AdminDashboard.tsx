@@ -8,6 +8,7 @@ type ShowcaseService = {
   title: string;
   description: string;
   icon: 'box' | 'house' | 'sparkles' | 'clapperboard';
+  svgUrl?: string;
   price: string;
 };
 
@@ -37,6 +38,7 @@ export const AdminDashboard: React.FC = () => {
   const [modelUrl, setModelUrl] = useState(settings.showcaseModelUrl || 'https://modelviewer.dev/shared-assets/models/Astronaut.glb');
   const [savingShowcase, setSavingShowcase] = useState(false);
   const [uploadingModel, setUploadingModel] = useState(false);
+  const [uploadingIconIndex, setUploadingIconIndex] = useState<number | null>(null);
   const [contacts, setContacts] = useState({
     contactEmail: settings.contactEmail || 'hello@artavenue.com',
     contactAddress: settings.contactAddress || 'Москва, Кутузовский пр-т, 12',
@@ -106,6 +108,26 @@ export const AdminDashboard: React.FC = () => {
       alert('Не удалось загрузить модель. Используйте прямую ссылку на .glb или повторите загрузку.');
     } finally {
       setUploadingModel(false);
+      event.target.value = '';
+    }
+  };
+
+  const uploadServiceIcon = async (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setUploadingIconIndex(index);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const response = await fetch('/api/upload', { method: 'POST', body: formData });
+      const payload = await response.json();
+      if (!response.ok || !payload.url) throw new Error('Upload failed');
+      updateShowcaseService(index, 'svgUrl', payload.url);
+    } catch {
+      alert('Не удалось загрузить SVG. Используйте ссылку на SVG или повторите загрузку.');
+    } finally {
+      setUploadingIconIndex(null);
       event.target.value = '';
     }
   };
@@ -232,6 +254,13 @@ export const AdminDashboard: React.FC = () => {
                   </button>
                 </div>
                 <textarea value={service.description} onChange={(event) => updateShowcaseService(index, 'description', event.target.value)} aria-label="Описание услуги" className="min-h-20 bg-black/40 border border-white/10 p-2 text-sm text-white outline-none focus:border-[#4b8eff] md:col-span-2" placeholder="Описание услуги" />
+                <div className="flex flex-col gap-3 md:col-span-2 sm:flex-row">
+                  <input type="url" value={service.svgUrl || ''} onChange={(event) => updateShowcaseService(index, 'svgUrl', event.target.value)} aria-label="Ссылка на SVG-иконку" className="min-w-0 flex-1 bg-black/40 border border-white/10 p-2 text-sm text-white outline-none focus:border-[#4b8eff]" placeholder="Ссылка на свою SVG-иконку (необязательно)" />
+                  <label className="inline-flex cursor-pointer items-center justify-center gap-2 border border-white/15 px-4 py-2 text-sm hover:bg-white/5">
+                    <Upload className="h-4 w-4" /> {uploadingIconIndex === index ? 'Загрузка...' : 'Загрузить SVG'}
+                    <input type="file" accept=".svg,image/svg+xml" onChange={(event) => uploadServiceIcon(index, event)} className="hidden" disabled={uploadingIconIndex !== null} />
+                  </label>
+                </div>
               </div>
             ))}
           </div>
